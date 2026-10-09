@@ -1,0 +1,5 @@
+--- orcad2kicad upstream compatibility patch (summary) ---
+Input-specific issue: six EDIF instances use (cellRef CELL_ID) with no nested libraryRef.
+Patch: resolve to the top-level design library's symbol by internal EDIF library ID; if unavailable, use a unique matching cell ID. Ambiguous matches are not guessed.
+Files changed only in the temporary working copy: src/orcad2kicad/edif_reader.py.
+User's uploaded EDF, source ZIP and GitHub repository were not changed.
