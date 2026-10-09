@@ -1,0 +1,9 @@
+Package: RK3588_WX8116_KiCad_electrical_validation_v2.zip
+Size: 1127617 bytes
+SHA-256: 312ac11520f21fbea18b8a714a8a200f7473fa00603b8c4ef138ff10f58be65c
+ZIP integrity: PASS (unzip -t: no errors detected)
+Uncompressed entries: 51
+Includes: KiCad project, root and child schematic files, custom symbol library, symbol library table, acceptance report, and supporting JSON/CSV/log files.
+Model-level connectivity validation: PASS
+KiCad native ERC: PENDING; not executed in build environment
+Repository status: ZIP itself is not present in this Git commit; only audit documents and package manifest are committed.
