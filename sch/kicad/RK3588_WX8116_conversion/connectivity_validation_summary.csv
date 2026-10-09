@@ -1,0 +1,18 @@
+metric,value,meaning
+source_schematic_pages,34,Pages reported by OrCAD EDIF parser
+source_placed_instances,1932,Instances reported by source parser
+source_unique_component_references,1914,Unique component reference designators
+source_symbol_definitions,313,Source symbol definitions
+source_wire_segments,8381,Wire segments in source model
+parsed_kicad_symbol_instances,2879,Includes power and auxiliary symbols
+target_unique_component_references,1914,Unique component reference designators
+component_reference_set_differences,0,Source and target reference sets match
+pin_number_inventory_differences,0,Pin-number inventory per reference matches
+component_value_differences,0,Parsed values match
+footprint_field_differences,0,Parsed footprint fields match
+target_parser_issues,0,Project parsed without converter-side parser issues
+shared_normalized_nets_with_pin_set_differences,43,Internal EDIF-joined vs geometry-derived check
+edif_join_only_normalized_nets,5,Names present only in EDIF joined model
+geometry_only_normalized_nets,42,Names present only in wire-geometry model
+kicad_native_erc,NOT_RUN,kicad-cli unavailable in execution environment
+electrical_connectivity_acceptance,NOT_PASSED,Requires resolving differences and validating against independent reference netlist
