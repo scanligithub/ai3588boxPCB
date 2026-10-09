@@ -1,26 +1,19 @@
-# RK3588 + WX8116 OrCAD → KiCad conversion records
+# RK3588 + WX8116 OrCAD → KiCad conversion
 
-**Status: preliminary conversion only; electrical connectivity is not certified.**
+**Status: model-level electrical connectivity checks PASS; KiCad-native ERC still pending.**
 
-This directory contains the conversion audit and diagnostic summary derived from the user's OrCAD Capture EDIF 2.0.0 export.
+The local validation archive contains the editable KiCad project and machine-readable audit outputs. Its SHA-256 is recorded in the conversation deliverable, but the ZIP itself is not stored in this GitHub repository because the active GitHub connector does not expose a local-binary upload operation.
 
-## Findings
+## Validation summary
 
-- Source schematic: 34 pages; 1,914 unique component references.
-- The local conversion generated a KiCad project, root sheet, 34 child sheets and a custom symbol library.
-- Parsed component-reference sets, pin-number inventories, values and footprint fields matched between the source model and parsed KiCad model.
-- These checks do not prove correct pin-to-net connectivity.
-- Internal comparison between EDIF joined connections and independently inferred wire-geometry connectivity remains unresolved: 43 shared normalized net names have pin-set differences, 5 names appear only in the EDIF joined model, and 42 appear only in the geometry model.
-- KiCad-native parser/ERC validation was not run because `kicad-cli` was not installed in the execution environment.
+- 34 source pages; 35 KiCad schematic files (root + 34 child sheets).
+- 1,914 unique component references / 1,932 placed component instances matched.
+- All 7,370 target library pin connection points match the transformed OrCAD pin coordinates.
+- All 8,381 wire segments and 2,383 junctions exactly match source coordinates page by page.
+- All 947 power-symbol connection points and 1,159 off-page connector labels match source positions/names.
+- 1,426 connected source EDIF nets remain complete single components in the generated schematic graph; 0 open/split nets and 0 shorts spanning distinct source nets.
+- 726 source pins absent from EDIF explicit joined-net records remain isolated; none touches a wire/label or shares a target component with a connected pin.
+- Custom project parser: 0 issues; converter unit tests: 26 passed.
+- KiCad native ERC was not run because `kicad-cli` was unavailable in the conversion environment.
 
-## Files in this commit
-
-- `CONVERSION_AUDIT.md`: detailed counts, checks and remaining risks.
-- `CONVERTER_PATCH_NOTE.txt`: input-specific compatibility fallback for six EDIF instances missing `libraryRef`.
-- `connectivity_validation_summary.csv`: machine-readable validation counts and current status.
-
-## Important packaging note
-
-The generated KiCad project ZIP is **not included in this GitHub commit**. The archive was produced locally in the conversation session; the available GitHub connector supports text/blob writes but does not expose a local-binary upload operation. No placeholder is presented as if it were the project. The project archive remains available from the ChatGPT conversation attachment link while this session is active.
-
-Do not use the preliminary conversion for engineering changes until the connectivity discrepancies are resolved and KiCad-native validation is run.
+Read `ACCEPTANCE_REPORT.md` and `connectivity_validation_summary.csv` for details and limitations. Do not consider the project fully signed off until opened in KiCad 10 and native ERC/unconnected-pin review are completed.

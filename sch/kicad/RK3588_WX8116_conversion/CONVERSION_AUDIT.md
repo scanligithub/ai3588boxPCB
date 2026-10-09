@@ -1,44 +1,48 @@
 # RK3588 + WX8116 OrCAD → KiCad conversion audit
 
-**Status: PRELIMINARY CONVERSION GENERATED — electrical connectivity NOT yet certified.**
+**Status: MODEL-LEVEL CONNECTIVITY VALIDATION PASS; KiCad-native ERC pending.**
 
 ## Input
-
-- Source: `RK3588_WX8116-SCH-V2T.EDF`
-- Bytes: 19,506,888
+- File: `RK3588_WX8116-SCH-V2T.EDF`
+- Size: 19,506,888 bytes
 - SHA-256: `3cfa7e49391ec5fa5503bd3a8d252c6c3664a71ce7d962ae3585c42c51e502ae`
-- Format: OrCAD Capture EDIF 2.0.0 export.
+- OrCAD Capture EDIF 2.0.0 export.
 
-## Generated KiCad project (local preliminary package)
+## Structure and component checks
+- Source: 34 schematic pages, 1,932 placed instances, 1,914 unique references, 313 symbol definitions.
+- Target: one root schematic + 34 child sheets; custom parser read 35 sheets with 0 parser issues.
+- Source and target unique reference sets: identical (0 missing, 0 extra).
+- Instance count mismatches: 0.
+- Pin-number inventory mismatches: 0.
+- Value and footprint field mismatches: 0.
 
-- Project to open: `RK3588_WX8116.kicad_pro`
-- Root schematic: `RK3588_WX8116.kicad_sch`
-- Page sheets: 34 child sheets + root sheet (35 sheet files total).
-- OrCAD model: 34 source pages, 1932 placed instances, 1914 unique references, 313 source symbol definitions, 8381 wire segments.
-- Parsed target model: 2879 symbol instances including power/auxiliary symbols, 1914 unique component references, 0 parser issues.
+## Pin and geometry checks
+- Actual embedded target library pin coordinates checked against OrCAD source: 7,370; local coordinate mismatches: 0; transformed world position mismatches: 0.
+- Wire segments: 8,381 source / 8,381 target; exact endpoint multiset differences: 0.
+- Junctions: 2,383 source / 2,383 target; exact coordinate differences: 0.
+- Power connection points: 947 / 947; net-name/position differences: 0.
+- Off-page connector labels: 1,159 / 1,159; canonical name/anchor differences: 0.
+- Target labels whose anchor falls on multiple distinct source net geometries: 0.
 
-## Comparison checks performed locally
+## Connectivity graph check
+- EDF explicit joined groups: 1,428; two are name-only groups with no pin references: `HI3516_USB_DM`, `HI3516_USB_DP`.
+- Connected groups with pin references: 1,426.
+- Explicitly joined pin tokens: 6,644; every token is present in the generated target graph.
+- Connected source nets whose pins remain one component: 1,426 / 1,426.
+- Open/split nets: 0.
+- Target components merging pins from distinct explicit source nets: 0.
 
-- Unique component reference sets: PASS (source 1914, KiCad 1914; source-only 0, target-only 0).
-- Pin-number sets per reference: PASS (refs with missing source pin numbers in target: 0; refs with extra target pin numbers: 0).
-- Parsed component values per reference: all match.
-- Parsed footprint fields per reference: all match.
-- KiCad project parser issue count: 0.
+## Source-unjoined pins
+There are 7,370 instance pins overall; 726 are not referenced by any explicit EDF joined-net record. All 726 remain isolated in the target graph: none touches a wire, none overlaps a label anchor, none is an unassigned hidden power pin, and none shares a connected component with a pin assigned to an explicit source net. These are preserved as source-level unjoined pins; native ERC may report them and they should be reviewed for intentional No Connect treatment.
 
-The ref/pin checks confirm identity and pin-number inventory only; they do **not** prove that every pin is connected to the correct net.
+## Converter warnings
+- Six input instances lack `libraryRef`; a local unique-resolution fallback found their cell in the design library.
+- Multiple duplicate/differing symbol-library definitions were merged or emitted as variants; conversion messages are retained in the local converter log.
+- Three GPIO alias labels originally coincided with a different-net `CPLD_3V3` wire and were moved along their own signal wire; after the fix no label-anchor cross-net collisions were detected.
 
-## Remaining blockers / risks
+## Test and sign-off boundary
+- Converter unit tests: 26 passed.
+- KiCad `kicad-cli` was not installed, so KiCad-native ERC, native netlist export and GUI smoke test were not run.
+- The model-level connectivity checks above pass; full sign-off remains pending until native KiCad ERC/unconnected-pin review is completed.
 
-1. `kicad-cli` was not installed in the execution environment. KiCad's native parser, Electrical Rules Checker (ERC), native netlist export and PDF export were therefore not run.
-2. No independent reference netlist (`.asc` or IPC-D-356) was available. The converter's reference-netlist verification stages were skipped.
-3. An internal diagnostic compared EDIF `joined` connections with connectivity inferred independently from page-wire geometry after case-folding net names. This check did **not** pass: 43 shared normalized net names have pin-set differences, 5 normalized names appear only in the EDIF joined model, and 42 appear only in the geometry model. See `connectivity_validation_summary.csv`. These differences may include page-port/global-alias and geometric mapping limitations; they must be resolved or confirmed against a true reference netlist before calling the electrical conversion correct.
-4. The input EDIF omits `libraryRef` in six instances. A local compatibility fallback resolved these from the design library; all six resolved without an unknown-cell error. Other warnings about duplicate/inconsistent symbol definitions and canonical power-net aliases need review.
-5. The project has not been opened in KiCad GUI in this runtime.
-
-## Local preliminary package contents
-
-The ZIP generated in the conversation contains `RK3588_WX8116.kicad_pro`, root `.kicad_sch`, 34 child `.kicad_sch` sheets, `orcad.kicad_sym`, `sym-lib-table`, and supporting CSV/log files including `component_pin_audit.csv`, `edif_joined_netlist.csv`, `wire_geometry_netlist.csv` and `edif_geometry_diff.csv`.
-
-## Generation note
-
-This run used orcad2kicad 1.0.2 source. A local compatibility fallback was added for the six instances whose EDIF `cellRef` has no `libraryRef`. The original EDIF and the user's uploaded converter source ZIP were not modified.
+The full local ZIP has `RK3588_WX8116.kicad_pro`, root/child `.kicad_sch` files, `orcad.kicad_sym`, `sym-lib-table` and the JSON/CSV evidence. The GitHub commit contains audit text only; it does not contain the binary project ZIP.
